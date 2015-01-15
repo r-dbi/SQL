@@ -17,9 +17,14 @@ sqlCreateTable(con, name, fields, temporary = FALSE, ...)
 \item{name}{Name of the table. Escaped with
 \code{\link[DBI]{dbQuoteIdentifier}}.}
 
-\item{fields}{A named character vector. Names are column names, values
-are types. Names are escaped with \code{\link[DBI]{dbQuoteIdentifier}}.
-Field types are unescaped.}
+\item{fields}{Either a character vector or a data frame.
+
+  A named character vector: Names are column names, values are types.
+  Names are escaped with \code{\link[DBI]{dbQuoteIdentifier}}.
+  Field types are unescaped.
+
+  A data frame: field types are generated using
+  \code{\link[DBI]{dbDataType}}.}
 
 \item{temporary}{If \code{TRUE}, will generate a temporary table statement.}
 
@@ -29,7 +34,14 @@ Field types are unescaped.}
 Exposes interface to simple \code{CREATE TABLE} commands. The default
 method is ANSI SQL 99 compliant.
 }
+\section{DBI-backends}{
+
+If you implement one method (i.e. for strings or data frames), you need
+to implement both, otherwise the S4 dispatch rules will be ambiguous
+and will generate an error on every call.
+}
 \examples{
 sqlCreateTable(ANSI(), "my-table", c(a = "integer", b = "text"))
+sqlCreateTable(ANSI(), "my-table", iris)
 }
 

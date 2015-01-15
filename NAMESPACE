@@ -2,11 +2,13 @@
 
 export(ANSI)
 export(sqlCreateTable)
+exportMethods(dbDataType)
 exportMethods(show)
 exportMethods(sqlCreateTable)
 importClassesFrom(DBI,DBIConnection)
 importClassesFrom(DBI,DBIObject)
 importFrom(DBI,SQL)
+importFrom(DBI,dbDataType)
 importFrom(DBI,dbQuoteIdentifier)
 importFrom(DBI,dbQuoteString)
 importFrom(methods,new)
