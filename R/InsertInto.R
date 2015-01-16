@@ -3,7 +3,6 @@
 #' @inheritParams sqlCreateTable
 #' @param values A data frame. Factors will be converted to character vectors.
 #'   Character vectors will be escaped with \code{\link[DBI]{dbQuoteString}}.
-#' @return A character vector with one element for each row in \code{values}.
 #' @export
 #' @examples
 #' sqlInsertInto(ANSI(), "mtcars", head(mtcars))
@@ -18,6 +17,7 @@ setMethod("sqlInsertInto", "DBIConnection", function(con, table, values, ...) {
   stopifnot(is.data.frame(values))
 
   table <- dbQuoteIdentifier(con, table)
+  fields <- dbQuoteIdentifier(con, names(values))
 
   # Convert factors to strings
   is_factor <- vapply(values, is.factor, logical(1))
@@ -29,5 +29,10 @@ setMethod("sqlInsertInto", "DBIConnection", function(con, table, values, ...) {
 
   # Convert fields into a character matrix
   rows <- do.call(paste, c(values, sep = ", "))
-  SQL(paste0("INSERT INTO ", table, " (", rows, ")"))
+  SQL(paste0(
+    "INSERT INTO  ", table, " ",
+    "(\n  ", paste(fields, collapse = ",\n  "), "\n)\n",
+    "VALUES\n",
+    paste0("  (", rows, ")", collapse = ",\n")
+  ))
 })

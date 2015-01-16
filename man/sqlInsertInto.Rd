@@ -21,9 +21,6 @@ Character vectors will be escaped with \code{\link[DBI]{dbQuoteString}}.}
 
 \item{...}{Other arguments used by individual methods.}
 }
-\value{
-A character vector with one element for each row in \code{values}.
-}
 \description{
 Insert rows into a table.
 }
