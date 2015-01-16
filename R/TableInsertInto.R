@@ -1,19 +1,19 @@
 #' Insert rows into a table.
 #'
-#' @inheritParams sqlCreateTable
+#' @inheritParams sqlTableCreate
 #' @param values A data frame. Factors will be converted to character vectors.
 #'   Character vectors will be escaped with \code{\link[DBI]{dbQuoteString}}.
 #' @export
 #' @examples
-#' sqlInsertInto(ANSI(), "mtcars", head(mtcars))
-#' sqlInsertInto(ANSI(), "iris", head(iris))
-setGeneric("sqlInsertInto", function(con, table, values, ...) {
-  standardGeneric("sqlInsertInto")
+#' sqlTableInsertInto(ANSI(), "mtcars", head(mtcars))
+#' sqlTableInsertInto(ANSI(), "iris", head(iris))
+setGeneric("sqlTableInsertInto", function(con, table, values, ...) {
+  standardGeneric("sqlTableInsertInto")
 })
 
 #' @export
-#' @rdname sqlInsertInto
-setMethod("sqlInsertInto", "DBIConnection", function(con, table, values, ...) {
+#' @rdname sqlTableInsertInto
+setMethod("sqlTableInsertInto", "DBIConnection", function(con, table, values, ...) {
   stopifnot(is.data.frame(values))
 
   table <- dbQuoteIdentifier(con, table)

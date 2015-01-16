@@ -27,15 +27,15 @@ NULL
 #' @param ... Other arguments used by individual methods.
 #' @export
 #' @examples
-#' sqlCreateTable(ANSI(), "my-table", c(a = "integer", b = "text"))
-#' sqlCreateTable(ANSI(), "my-table", iris)
-setGeneric("sqlCreateTable", function(con, table, fields, temporary = FALSE, ...) {
-  standardGeneric("sqlCreateTable")
+#' sqlTableCreate(ANSI(), "my-table", c(a = "integer", b = "text"))
+#' sqlTableCreate(ANSI(), "my-table", iris)
+setGeneric("sqlTableCreate", function(con, table, fields, temporary = FALSE, ...) {
+  standardGeneric("sqlTableCreate")
 })
 
 #' @export
-#' @rdname sqlCreateTable
-setMethod("sqlCreateTable", "DBIConnection",
+#' @rdname sqlTableCreate
+setMethod("sqlTableCreate", "DBIConnection",
   function(con, table, fields, temporary = FALSE, ...) {
     table <- dbQuoteIdentifier(con, table)
 
