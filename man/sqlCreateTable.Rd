@@ -6,15 +6,15 @@
 \alias{sqlCreateTable,DBIConnection-method}
 \title{Create a simple table.}
 \usage{
-sqlCreateTable(con, name, fields, temporary = FALSE, ...)
+sqlCreateTable(con, table, fields, temporary = FALSE, ...)
 
-\S4method{sqlCreateTable}{DBIConnection}(con, name, fields, temporary = FALSE,
-  ...)
+\S4method{sqlCreateTable}{DBIConnection}(con, table, fields,
+  temporary = FALSE, ...)
 }
 \arguments{
 \item{con}{A database connection.}
 
-\item{name}{Name of the table. Escaped with
+\item{table}{Name of the table. Escaped with
 \code{\link[DBI]{dbQuoteIdentifier}}.}
 
 \item{fields}{Either a character vector or a data frame.

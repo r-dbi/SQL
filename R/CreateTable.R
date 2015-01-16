@@ -13,7 +13,7 @@ NULL
 #' and will generate an error on every call.
 #'
 #' @param con A database connection.
-#' @param name Name of the table. Escaped with
+#' @param table Name of the table. Escaped with
 #'   \code{\link[DBI]{dbQuoteIdentifier}}.
 #' @param fields Either a character vector or a data frame.
 #'
@@ -29,15 +29,15 @@ NULL
 #' @examples
 #' sqlCreateTable(ANSI(), "my-table", c(a = "integer", b = "text"))
 #' sqlCreateTable(ANSI(), "my-table", iris)
-setGeneric("sqlCreateTable", function(con, name, fields, temporary = FALSE, ...) {
+setGeneric("sqlCreateTable", function(con, table, fields, temporary = FALSE, ...) {
   standardGeneric("sqlCreateTable")
 })
 
 #' @export
 #' @rdname sqlCreateTable
-setMethod("sqlCreateTable", c("DBIConnection"),
-  function(con, name, fields, temporary = FALSE, ...) {
-    name <- dbQuoteIdentifier(con, name)
+setMethod("sqlCreateTable", "DBIConnection",
+  function(con, table, fields, temporary = FALSE, ...) {
+    table <- dbQuoteIdentifier(con, table)
 
     if (is.data.frame(fields)) {
       fields <- vapply(fields, function(x) DBI::dbDataType(con, x), character(1))
@@ -48,7 +48,7 @@ setMethod("sqlCreateTable", c("DBIConnection"),
     fields <- paste0(field_names, " ", field_types)
 
     SQL(paste0(
-      "CREATE ", if (temporary) "TEMPORARY ", "TABLE ", name, " (\n",
+      "CREATE ", if (temporary) "TEMPORARY ", "TABLE ", table, " (\n",
       "  ", paste(fields, collapse = ",\n  "), "\n)\n"
     ))
   }
