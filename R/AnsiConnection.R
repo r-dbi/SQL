@@ -1,4 +1,6 @@
 #' @importClassesFrom DBI DBIConnection DBIObject
+#' @useDynLib SQL
+#' @importFrom Rcpp sourceCpp
 setClass("AnsiConnection", contains = "DBIConnection")
 
 #' A dummy DBI connector that simulates ANSI-SQL compliance
