@@ -1,5 +1,7 @@
-#include "sqldelim.h"
+#include <Rcpp.h>
+using namespace Rcpp;
 
+#include "sqldelim.h"
 #include <assert.h>
 #include <iostream>
 
@@ -166,5 +168,50 @@ ParseResult parseQuery(const std::string& query, const QuoteSpecs& quoteSpecs,
 	}
 
 	return ParseResult(regions);
+}
+
+// [[Rcpp::export]]
+List parseSql(std::string sql) {
+  if (sql.size() == 0) {
+    return List::create(
+      _["start"] = IntegerVector(0),
+      _["end"] = IntegerVector(0),
+      _["tag"] = IntegerVector(0)
+    );
+  }
+
+  QuoteSpecs quoteSpecs;
+  quoteSpecs.push_back(QuoteSpec(1, '\'', '\'', '\\', true));
+  quoteSpecs.push_back(QuoteSpec(1, '"', '"', '\\', true));
+  CommentSpecs commentSpecs;
+  commentSpecs.push_back(CommentSpec(2, "/*", "*/", true));
+  commentSpecs.push_back(CommentSpec(2, "--", "\n", false));
+  commentSpecs.push_back(CommentSpec(2, "#", "\n", false));
+
+  ParseResult result = parseQuery(sql, quoteSpecs, commentSpecs);
+
+  if (!result.success) {
+    std::stringstream err;
+    err << "ERROR: " << result.errorMessage << " : " << result.errorOffset;
+    stop(err.str());
+  }
+
+  // Convert result into list
+  Regions regions = result.regions;
+  int n = regions.size();
+  IntegerVector start(n), end(n), tag(n);
+
+  for (int i = 0; i < n; ++i) {
+    Region reg = regions[i];
+
+    start[i] = reg.startOffset;
+    end[i] = reg.startOffset + reg.length - 1;
+    tag[i] = reg.tag;
+  }
+  return List::create(
+    _["start"] = start,
+    _["end"] = end,
+    _["tag"] = tag
+  );
 }
 
