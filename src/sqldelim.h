@@ -2,26 +2,23 @@
 #include <vector>
 
 struct QuoteSpec {
-	int tag;
 	char startChar;
 	char endChar;
 	char escapeChar;
 	bool doubleEscape;
 
-	QuoteSpec(int tag, char startChar, char endChar, char escapeChar, char doubleEscape);
+	QuoteSpec(char startChar, char endChar, char escapeChar, char doubleEscape);
 };
 
 struct CommentSpec {
-	int tag;
 	std::string startStr;
 	std::string endStr;
 	bool endStrRequired;
 
-	CommentSpec(int tag, const std::string& startStr, const std::string& endStr, bool endStrRequired);
+	CommentSpec(const std::string& startStr, const std::string& endStr, bool endStrRequired);
 };
 
 struct Region {
-	int tag;
 	int startOffset;
 	int length;
 };

@@ -5,12 +5,12 @@ using namespace Rcpp;
 #include <assert.h>
 #include <iostream>
 
-QuoteSpec::QuoteSpec(int tag, char startChar, char endChar, char escapeChar, char doubleEscape) :
-	tag(tag), startChar(startChar), endChar(endChar), escapeChar(escapeChar), doubleEscape(doubleEscape) {
+QuoteSpec::QuoteSpec(char startChar, char endChar, char escapeChar, char doubleEscape) :
+	startChar(startChar), endChar(endChar), escapeChar(escapeChar), doubleEscape(doubleEscape) {
 }
 
-CommentSpec::CommentSpec(int tag, const std::string& startStr, const std::string& endStr, bool endStrRequired) :
-	tag(tag), startStr(startStr), endStr(endStr), endStrRequired(endStrRequired) {
+CommentSpec::CommentSpec(const std::string& startStr, const std::string& endStr, bool endStrRequired) :
+	startStr(startStr), endStr(endStr), endStrRequired(endStrRequired) {
 }
 
 
@@ -141,7 +141,6 @@ ParseResult parseQuery(const std::string& query, const QuoteSpecs& quoteSpecs,
 				return ParseResult("Unterminated literal", it - query.begin());
 			} else {
 				Region region;
-				region.tag = quoteSpecs[qi].tag;
 				region.startOffset = it - query.begin();
 				region.length = regionEnd - it;
 				regions.push_back(region);
@@ -158,7 +157,6 @@ ParseResult parseQuery(const std::string& query, const QuoteSpecs& quoteSpecs,
 				return ParseResult("Unterminated comment", it - query.begin());
 			} else {
 				Region region;
-				region.tag = commentSpecs[ci].tag;
 				region.startOffset = it - query.begin();
 				region.length = regionEnd - it;
 				regions.push_back(region);
@@ -175,18 +173,17 @@ List parseSql(std::string sql) {
   if (sql.size() == 0) {
     return List::create(
       _["start"] = IntegerVector(0),
-      _["end"] = IntegerVector(0),
-      _["tag"] = IntegerVector(0)
+      _["end"] = IntegerVector(0)
     );
   }
 
   QuoteSpecs quoteSpecs;
-  quoteSpecs.push_back(QuoteSpec(1, '\'', '\'', '\\', true));
-  quoteSpecs.push_back(QuoteSpec(1, '"', '"', '\\', true));
+  quoteSpecs.push_back(QuoteSpec('\'', '\'', '\\', true));
+  quoteSpecs.push_back(QuoteSpec('"', '"', '\\', true));
   CommentSpecs commentSpecs;
-  commentSpecs.push_back(CommentSpec(2, "/*", "*/", true));
-  commentSpecs.push_back(CommentSpec(2, "--", "\n", false));
-  commentSpecs.push_back(CommentSpec(2, "#", "\n", false));
+  commentSpecs.push_back(CommentSpec("/*", "*/", true));
+  commentSpecs.push_back(CommentSpec("--", "\n", false));
+  commentSpecs.push_back(CommentSpec("#", "\n", false));
 
   ParseResult result = parseQuery(sql, quoteSpecs, commentSpecs);
 
@@ -199,19 +196,17 @@ List parseSql(std::string sql) {
   // Convert result into list
   Regions regions = result.regions;
   int n = regions.size();
-  IntegerVector start(n), end(n), tag(n);
+  IntegerVector start(n), end(n);
 
   for (int i = 0; i < n; ++i) {
     Region reg = regions[i];
 
     start[i] = reg.startOffset;
     end[i] = reg.startOffset + reg.length - 1;
-    tag[i] = reg.tag;
   }
   return List::create(
     _["start"] = start,
-    _["end"] = end,
-    _["tag"] = tag
+    _["end"] = end
   );
 }
 
