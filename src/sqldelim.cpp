@@ -3,6 +3,7 @@ using namespace Rcpp;
 
 #include "sqldelim.h"
 #include <assert.h>
+#include <ctype.h>
 #include <iostream>
 
 QuoteSpec::QuoteSpec(char startChar, char endChar, char escapeChar, char doubleEscape) :
@@ -140,11 +141,7 @@ ParseResult parseQuery(const std::string& query, const QuoteSpecs& quoteSpecs,
 				// Report error and exit
 				return ParseResult("Unterminated literal", it - query.begin());
 			} else {
-				Region region;
-				region.startOffset = it - query.begin();
-				region.length = regionEnd - it;
-				regions.push_back(region);
-				it += region.length - 1;
+			  it += (regionEnd - it) - 1;
 			}
 		}
 
@@ -156,12 +153,25 @@ ParseResult parseQuery(const std::string& query, const QuoteSpecs& quoteSpecs,
 				// Report error and exit
 				return ParseResult("Unterminated comment", it - query.begin());
 			} else {
-				Region region;
-				region.startOffset = it - query.begin();
-				region.length = regionEnd - it;
-				regions.push_back(region);
-				it += region.length - 1;
+				it += (regionEnd - it) - 1;
 			}
+		}
+
+		// Is this a variable?
+		if (*it == '?') {
+		  if (it + 1 == query.end())
+		    return ParseResult("Length 0 variable", it - query.begin());
+
+		  it++;
+		  size_t start = it - query.begin();
+
+		  while ((isalnum(*it) || *it == '_' || *it == '.') && it + 1 != query.end())
+		    it++;
+
+		  Region region;
+		  region.startOffset = start;
+		  region.length = (it - query.begin()) - start;
+		  regions.push_back(region);
 		}
 	}
 
