@@ -199,7 +199,7 @@ List parseSql(std::string sql) {
 
   if (!result.success) {
     std::stringstream err;
-    err << "ERROR: " << result.errorMessage << " : " << result.errorOffset;
+    err << result.errorMessage << " (pos: " << result.errorOffset << ")";
     stop(err.str());
   }
 
