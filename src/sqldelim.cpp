@@ -162,15 +162,15 @@ ParseResult parseQuery(const std::string& query, const QuoteSpecs& quoteSpecs,
 		  if (it + 1 == query.end())
 		    return ParseResult("Length 0 variable", it - query.begin());
 
-		  it++;
 		  size_t start = it - query.begin();
 
+		  it++;
 		  while ((isalnum(*it) || *it == '_' || *it == '.') && it + 1 != query.end())
 		    it++;
 
 		  Region region;
 		  region.startOffset = start;
-		  region.length = (it - query.begin()) - start;
+		  region.length = (it - query.begin()) - start + 1;
 		  regions.push_back(region);
 		}
 	}
@@ -211,8 +211,8 @@ List parseSql(std::string sql) {
   for (int i = 0; i < n; ++i) {
     Region reg = regions[i];
 
-    start[i] = reg.startOffset;
-    end[i] = reg.startOffset + reg.length - 1;
+    start[i] = reg.startOffset + 1;
+    end[i] = reg.startOffset + 1 + reg.length;
   }
   return List::create(
     _["start"] = start,
