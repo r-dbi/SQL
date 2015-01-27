@@ -141,7 +141,8 @@ ParseResult parseQuery(const std::string& query, const QuoteSpecs& quoteSpecs,
 				// Report error and exit
 				return ParseResult("Unterminated literal", it - query.begin());
 			} else {
-			  it += (regionEnd - it) - 1;
+			  it = regionEnd; it--;
+			  continue;
 			}
 		}
 
@@ -153,7 +154,8 @@ ParseResult parseQuery(const std::string& query, const QuoteSpecs& quoteSpecs,
 				// Report error and exit
 				return ParseResult("Unterminated comment", it - query.begin());
 			} else {
-				it += (regionEnd - it) - 1;
+				it = regionEnd; it--;
+			  continue;
 			}
 		}
 
@@ -165,13 +167,16 @@ ParseResult parseQuery(const std::string& query, const QuoteSpecs& quoteSpecs,
 		  size_t start = it - query.begin();
 
 		  it++;
-		  while ((isalnum(*it) || *it == '_' || *it == '.') && it + 1 != query.end())
+		  while (it != query.end() && (isalnum(*it) || *it == '_' || *it == '.'))
 		    it++;
 
+		  it--;
 		  Region region;
 		  region.startOffset = start;
 		  region.length = (it - query.begin()) - start + 1;
 		  regions.push_back(region);
+
+		  continue;
 		}
 	}
 
@@ -212,7 +217,7 @@ List parseSql(std::string sql) {
     Region reg = regions[i];
 
     start[i] = reg.startOffset + 1;
-    end[i] = reg.startOffset + 1 + reg.length;
+    end[i] = reg.startOffset + 1 + reg.length - 1; // -1 because string indexing is inclusive in R
   }
   return List::create(
     _["start"] = start,
