@@ -1,7 +1,7 @@
 #' Safely interpolate values into an SQL string.
 #'
 #' @param _con A database connection.
-#' @param _sql A SQL string containing containing variables to interpolate.
+#' @param `_sql` A SQL string containing containing variables to interpolate.
 #'   Variables must start with a question mark and can be any valid R
 #'   identifier, i.e. it must start with a letter or \code{.}, and be followed
 #'   by a letter, digit, \code{.} or \code{_}.
