@@ -183,8 +183,15 @@ ParseResult parseQuery(const std::string& query, const QuoteSpecs& quoteSpecs,
 	return ParseResult(regions);
 }
 
+//' @export
+//' @rdname sqlParseVariables
+//' @param sql SQL to parse (a character vector of length 1)
+//' @param quotes A list of \code{QuoteSpec} calls defining the quoting
+//'   specification.
+//' @param comments A list of \code{CommentSpec} calls defining the commenting
+//'   specification.
 // [[Rcpp::export]]
-List parseSql(std::string sql) {
+List sqlParseVariablesImpl(std::string sql, ListOf<List> quotes, ListOf<List> comments) {
   if (sql.size() == 0) {
     return List::create(
       _["start"] = IntegerVector(0),
@@ -193,12 +200,27 @@ List parseSql(std::string sql) {
   }
 
   QuoteSpecs quoteSpecs;
-  quoteSpecs.push_back(QuoteSpec('\'', '\'', '\\', true));
-  quoteSpecs.push_back(QuoteSpec('"', '"', '\\', true));
+  for (int i = 0; i < quotes.size(); ++i) {
+    List quote = quotes[i];
+
+    quoteSpecs.push_back(QuoteSpec(
+        as<std::string>(quote[0])[0],
+        as<std::string>(quote[1])[0],
+        as<std::string>(quote[2])[0],
+        as<bool>(quote[3])
+    ));
+  }
+
   CommentSpecs commentSpecs;
-  commentSpecs.push_back(CommentSpec("/*", "*/", true));
-  commentSpecs.push_back(CommentSpec("--", "\n", false));
-  commentSpecs.push_back(CommentSpec("#", "\n", false));
+  for (int i = 0; i < comments.size(); ++i) {
+    List comment = comments[i];
+
+    commentSpecs.push_back(CommentSpec(
+        as<std::string>(comment[0]),
+        as<std::string>(comment[1]),
+        as<bool>(comment[2])
+    ));
+  }
 
   ParseResult result = parseQuery(sql, quoteSpecs, commentSpecs);
 

@@ -1,5 +1,11 @@
 #' Safely interpolate values into an SQL string.
 #'
+#' @section Backend authors:
+#' If you are implementing a SQL backend with non-ANSI quoting rules, you'll
+#' need to implement a method for \code{\link{sqlParseVariables}}. Failure to
+#' do so does not expose you to SQL injection attacks, but will (rarely) result
+#' in errors matching supplied and interpolated variables.
+#'
 #' @param _con A database connection.
 #' @param `_sql` A SQL string containing containing variables to interpolate.
 #'   Variables must start with a question mark and can be any valid R
@@ -22,7 +28,7 @@ setGeneric("sqlInterpolate", function(`_con`, `_sql`, ...) {
 #' @rdname sqlInterpolate
 setMethod("sqlInterpolate", "DBIConnection", function(`_con`, `_sql`, ...) {
   sql <- `_sql`
-  pos <- parseSql(sql)
+  pos <- sqlParseVariables(`_con`, sql)
 
   if (length(pos$start) == 0)
     return(SQL(sql))
@@ -53,3 +59,62 @@ setMethod("sqlInterpolate", "DBIConnection", function(`_con`, `_sql`, ...) {
 
   SQL(sql)
 })
+
+#' Parse interpolated variables from SQL.
+#'
+#' If you're implementing a backend that uses non-ANSI quoting or commenting
+#' rules, you'll need to implement a method for \code{sqlParseVariables} that
+#' calls \code{sqlParseVariablesImpl} with the appropriate quote and
+#' comment specifications.
+#'
+#'
+#' @param start,end Start and end characters for quotes and comments
+#' @param endRequired Is the ending character of a comment required?
+#' @param doubleEscape Can quoting characters be escaped by doubling them?
+#'   Defaults to \code{TRUE}.
+#' @param escape What character can be used to escape quoting characters?
+#'   Defaults to \code{""}, i.e. nothing.
+#' @keywords internal
+#' @export
+#' @examples
+#' # Use [] for quoting and no comments
+#' sqlParseVariablesImpl("[?a]",
+#'   list(QuoteSpec("[", "]", "\\", FALSE)),
+#'   list()
+#' )
+#'
+#' # Standard quotes, use # for commenting
+#' sqlParseVariablesImpl("# ?a\n?b",
+#'   list(QuoteSpec("'", "'"), QuoteSpec('"', '"')),
+#'   list(CommentSpec("#", "\n", FALSE))
+#' )
+setGeneric("sqlParseVariables", function(con, sql, ...) {
+  standardGeneric("sqlParseVariables")
+})
+
+#' @export
+#' @rdname sqlParseVariables
+setMethod("sqlParseVariables", "DBIConnection", function(con, sql, ...) {
+  sqlParseVariablesImpl(sql,
+    list(
+      QuoteSpec('"', "'"),
+      QuoteSpec("'", "'")
+    ),
+    list(
+      CommentSpec("/*", "*/", TRUE),
+      CommentSpec("--", "\n", FALSE)
+    )
+  )
+})
+
+#' @export
+#' @rdname sqlParseVariables
+CommentSpec <- function(start, end, endRequired) {
+  list(start, end, endRequired)
+}
+
+#' @export
+#' @rdname sqlParseVariables
+QuoteSpec <- function(start, end, escape = "", doubleEscape = TRUE) {
+  list(start, end, escape, doubleEscape)
+}

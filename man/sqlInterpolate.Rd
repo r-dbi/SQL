@@ -25,6 +25,13 @@ by a letter, digit, \code{.} or \code{_}.}
 \description{
 Safely interpolate values into an SQL string.
 }
+\section{Backend authors}{
+
+If you are implementing a SQL backend with non-ANSI quoting rules, you'll
+need to implement a method for \code{\link{sqlParseVariables}}. Failure to
+do so does not expose you to SQL injection attacks, but will (rarely) result
+in errors matching supplied and interpolated variables.
+}
 \examples{
 sql <- "SELECT * FROM X WHERE name = ?name"
 sqlInterpolate(ANSI(), sql, name = "Hadley")

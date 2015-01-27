@@ -5,15 +5,17 @@
 
 using namespace Rcpp;
 
-// parseSql
-List parseSql(std::string sql);
-RcppExport SEXP SQL_parseSql(SEXP sqlSEXP) {
+// sqlParseVariablesImpl
+List sqlParseVariablesImpl(std::string sql, ListOf<List> quotes, ListOf<List> comments);
+RcppExport SEXP SQL_sqlParseVariablesImpl(SEXP sqlSEXP, SEXP quotesSEXP, SEXP commentsSEXP) {
 BEGIN_RCPP
     SEXP __sexp_result;
     {
         Rcpp::RNGScope __rngScope;
         Rcpp::traits::input_parameter< std::string >::type sql(sqlSEXP );
-        List __result = parseSql(sql);
+        Rcpp::traits::input_parameter< ListOf<List> >::type quotes(quotesSEXP );
+        Rcpp::traits::input_parameter< ListOf<List> >::type comments(commentsSEXP );
+        List __result = sqlParseVariablesImpl(sql, quotes, comments);
         PROTECT(__sexp_result = Rcpp::wrap(__result));
     }
     UNPROTECT(1);
