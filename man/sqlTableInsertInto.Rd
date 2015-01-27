@@ -6,9 +6,10 @@
 \alias{sqlTableInsertInto,DBIConnection-method}
 \title{Insert rows into a table.}
 \usage{
-sqlTableInsertInto(con, table, values, ...)
+sqlTableInsertInto(con, table, values, row.names = NA, ...)
 
-\S4method{sqlTableInsertInto}{DBIConnection}(con, table, values, ...)
+\S4method{sqlTableInsertInto}{DBIConnection}(con, table, values,
+  row.names = NA, ...)
 }
 \arguments{
 \item{con}{A database connection.}
@@ -19,13 +20,26 @@ sqlTableInsertInto(con, table, values, ...)
 \item{values}{A data frame. Factors will be converted to character vectors.
 Character vectors will be escaped with \code{\link[DBI]{dbQuoteString}}.}
 
+\item{row.names}{Either \code{TRUE}, \code{FALSE}, \code{NA} or a string.
+
+  If \code{TRUE}, always translate row names to a column called "row_names".
+  If \code{FALSE}, never translate row names. If \code{NA}, translate
+  rownames only if they're a character vector.
+
+  A string is equivalent to \code{TRUE}, but allows you to override the
+  default name.
+
+  For backward compatibility, \code{NULL} is equivalent to \code{FALSE}.}
+
 \item{...}{Other arguments used by individual methods.}
 }
 \description{
 Insert rows into a table.
 }
 \examples{
-sqlTableInsertInto(ANSI(), "mtcars", head(mtcars))
 sqlTableInsertInto(ANSI(), "iris", head(iris))
+
+sqlTableInsertInto(ANSI(), "mtcars", head(mtcars))
+sqlTableInsertInto(ANSI(), "mtcars", head(mtcars), row.names = FALSE)
 }
 

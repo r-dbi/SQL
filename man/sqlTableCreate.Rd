@@ -6,10 +6,10 @@
 \alias{sqlTableCreate,DBIConnection-method}
 \title{Create a simple table.}
 \usage{
-sqlTableCreate(con, table, fields, temporary = FALSE, ...)
+sqlTableCreate(con, table, fields, row.names = NA, temporary = FALSE, ...)
 
-\S4method{sqlTableCreate}{DBIConnection}(con, table, fields,
-  temporary = FALSE, ...)
+\S4method{sqlTableCreate}{DBIConnection}(con, table, fields, row.names = NA,
+  temporary = FALSE...)
 }
 \arguments{
 \item{con}{A database connection.}
@@ -25,6 +25,17 @@ sqlTableCreate(con, table, fields, temporary = FALSE, ...)
 
   A data frame: field types are generated using
   \code{\link[DBI]{dbDataType}}.}
+
+\item{row.names}{Either \code{TRUE}, \code{FALSE}, \code{NA} or a string.
+
+  If \code{TRUE}, always translate row names to a column called "row_names".
+  If \code{FALSE}, never translate row names. If \code{NA}, translate
+  rownames only if they're a character vector.
+
+  A string is equivalent to \code{TRUE}, but allows you to override the
+  default name.
+
+  For backward compatibility, \code{NULL} is equivalent to \code{FALSE}.}
 
 \item{temporary}{If \code{TRUE}, will generate a temporary table statement.}
 
@@ -43,5 +54,9 @@ and will generate an error on every call.
 \examples{
 sqlTableCreate(ANSI(), "my-table", c(a = "integer", b = "text"))
 sqlTableCreate(ANSI(), "my-table", iris)
+
+# By default, character row names are converted to a row_names colum
+sqlTableCreate(ANSI(), "mtcars", mtcars[, 1:5])
+sqlTableCreate(ANSI(), "mtcars", mtcars[, 1:5], row.names = FALSE)
 }
 

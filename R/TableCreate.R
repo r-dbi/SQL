@@ -24,22 +24,29 @@ NULL
 #'   A data frame: field types are generated using
 #'   \code{\link[DBI]{dbDataType}}.
 #' @param temporary If \code{TRUE}, will generate a temporary table statement.
+#' @inheritParams rownames
 #' @param ... Other arguments used by individual methods.
 #' @export
 #' @examples
 #' sqlTableCreate(ANSI(), "my-table", c(a = "integer", b = "text"))
 #' sqlTableCreate(ANSI(), "my-table", iris)
-setGeneric("sqlTableCreate", function(con, table, fields, temporary = FALSE, ...) {
+#'
+#' # By default, character row names are converted to a row_names colum
+#' sqlTableCreate(ANSI(), "mtcars", mtcars[, 1:5])
+#' sqlTableCreate(ANSI(), "mtcars", mtcars[, 1:5], row.names = FALSE)
+setGeneric("sqlTableCreate", function(con, table, fields, row.names = NA,
+                                           temporary = FALSE, ...) {
   standardGeneric("sqlTableCreate")
 })
 
 #' @export
 #' @rdname sqlTableCreate
 setMethod("sqlTableCreate", "DBIConnection",
-  function(con, table, fields, temporary = FALSE, ...) {
+  function(con, table, fields, row.names = NA, temporary = FALSE...) {
     table <- dbQuoteIdentifier(con, table)
 
     if (is.data.frame(fields)) {
+      fields <- rownamesToColumn(fields, row.names)
       fields <- vapply(fields, function(x) DBI::dbDataType(con, x), character(1))
     }
 
