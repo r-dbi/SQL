@@ -13,7 +13,6 @@ LazyData: true
 Imports:
     DBI (>= 0.3.1.9001),
     methods,
-    Rcpp,
-    stringi
+    Rcpp
 Suggests: testthat
 LinkingTo: Rcpp
