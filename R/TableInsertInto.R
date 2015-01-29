@@ -10,7 +10,6 @@
 #'
 #' sqlTableInsertInto(ANSI(), "mtcars", head(mtcars))
 #' sqlTableInsertInto(ANSI(), "mtcars", head(mtcars), row.names = FALSE)
-#'
 setGeneric("sqlTableInsertInto", function(con, table, values, row.names = NA,
                                           ...) {
   standardGeneric("sqlTableInsertInto")
@@ -29,8 +28,8 @@ setMethod("sqlTableInsertInto", "DBIConnection",
     # Convert fields into a character matrix
     rows <- do.call(paste, c(sql_values, sep = ", "))
     SQL(paste0(
-      "INSERT INTO  ", table, " ",
-      "(\n  ", paste(fields, collapse = ",\n  "), "\n)\n",
+      "INSERT INTO ", table, "\n",
+      "  (", paste(fields, collapse = ", "), ")\n",
       "VALUES\n",
       paste0("  (", rows, ")", collapse = ",\n")
     ))
