@@ -21,9 +21,9 @@ setMethod("sqlTableInsertInto", "DBIConnection",
   function(con, table, values, row.names = NA, ...) {
     stopifnot(is.data.frame(values))
 
-    table <- dbQuoteIdentifier(con, table)
-    fields <- dbQuoteIdentifier(con, names(values))
     sql_values <- sqlDf(con, values, row.names)
+    table <- dbQuoteIdentifier(con, table)
+    fields <- dbQuoteIdentifier(con, names(sql_values))
 
     # Convert fields into a character matrix
     rows <- do.call(paste, c(sql_values, sep = ", "))
