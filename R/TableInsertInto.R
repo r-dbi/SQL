@@ -23,20 +23,11 @@ setMethod("sqlTableInsertInto", "DBIConnection",
     stopifnot(is.data.frame(values))
 
     table <- dbQuoteIdentifier(con, table)
-
-    values <- rownamesToColumn(values, row.names)
     fields <- dbQuoteIdentifier(con, names(values))
-
-    # Convert factors to strings
-    is_factor <- vapply(values, is.factor, logical(1))
-    values[is_factor] <- lapply(values[is_factor], as.character)
-
-    # Quote all strings
-    is_char <- vapply(values, is.character, logical(1))
-    values[is_char] <- lapply(values[is_char], function(x) dbQuoteString(con, x))
+    sql_values <- sqlDf(con, values, row.names)
 
     # Convert fields into a character matrix
-    rows <- do.call(paste, c(values, sep = ", "))
+    rows <- do.call(paste, c(sql_values, sep = ", "))
     SQL(paste0(
       "INSERT INTO  ", table, " ",
       "(\n  ", paste(fields, collapse = ",\n  "), "\n)\n",
@@ -45,3 +36,21 @@ setMethod("sqlTableInsertInto", "DBIConnection",
     ))
   }
 )
+
+sqlDf <- function(con, df, row.names = NA) {
+  df <- rownamesToColumn(df, row.names)
+
+  # Convert factors to strings
+  is_factor <- vapply(df, is.factor, logical(1))
+  df[is_factor] <- lapply(df[is_factor], as.character)
+
+  # Quote all strings
+  is_char <- vapply(df, is.character, logical(1))
+  df[is_char] <- lapply(df[is_char], function(x) dbQuoteString(con, x))
+
+  # Convert everything to character and turn NAs into NULL
+  df[] <- lapply(df, as.character)
+  df[is.na(df)] <- "NULL"
+
+  df
+}
