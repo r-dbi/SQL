@@ -1,4 +1,4 @@
-context("sqlDf")
+context("sqlData")
 
 test_that("NAs turn in NULLs", {
   df <- data.frame(
@@ -6,7 +6,7 @@ test_that("NAs turn in NULLs", {
     y = c("a", NA),
     stringsAsFactors = FALSE
   )
-  sql_df <- sqlDf(ANSI(), df)
+  sql_df <- sqlData(ANSI(), df)
 
   expect_equal(sql_df$x, c("1", "NULL"))
   expect_equal(sql_df$y, c("'a'", "NULL"))

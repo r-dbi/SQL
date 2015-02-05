@@ -21,7 +21,7 @@ setMethod("sqlTableInsertInto", "DBIConnection",
   function(con, table, values, row.names = NA, ...) {
     stopifnot(is.data.frame(values))
 
-    sql_values <- sqlDf(con, values, row.names)
+    sql_values <- sqlData(con, values, row.names)
     table <- dbQuoteIdentifier(con, table)
     fields <- dbQuoteIdentifier(con, names(sql_values))
 
@@ -35,21 +35,3 @@ setMethod("sqlTableInsertInto", "DBIConnection",
     ))
   }
 )
-
-sqlDf <- function(con, df, row.names = NA) {
-  df <- rownamesToColumn(df, row.names)
-
-  # Convert factors to strings
-  is_factor <- vapply(df, is.factor, logical(1))
-  df[is_factor] <- lapply(df[is_factor], as.character)
-
-  # Quote all strings
-  is_char <- vapply(df, is.character, logical(1))
-  df[is_char] <- lapply(df[is_char], function(x) dbQuoteString(con, x))
-
-  # Convert everything to character and turn NAs into NULL
-  df[] <- lapply(df, as.character)
-  df[is.na(df)] <- "NULL"
-
-  df
-}
