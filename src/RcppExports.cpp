@@ -9,16 +9,12 @@ using namespace Rcpp;
 List sqlParseVariablesImpl(std::string sql, ListOf<List> quotes, ListOf<List> comments);
 RcppExport SEXP SQL_sqlParseVariablesImpl(SEXP sqlSEXP, SEXP quotesSEXP, SEXP commentsSEXP) {
 BEGIN_RCPP
-    SEXP __sexp_result;
-    {
-        Rcpp::RNGScope __rngScope;
-        Rcpp::traits::input_parameter< std::string >::type sql(sqlSEXP );
-        Rcpp::traits::input_parameter< ListOf<List> >::type quotes(quotesSEXP );
-        Rcpp::traits::input_parameter< ListOf<List> >::type comments(commentsSEXP );
-        List __result = sqlParseVariablesImpl(sql, quotes, comments);
-        PROTECT(__sexp_result = Rcpp::wrap(__result));
-    }
-    UNPROTECT(1);
-    return __sexp_result;
+    Rcpp::RObject __result;
+    Rcpp::RNGScope __rngScope;
+    Rcpp::traits::input_parameter< std::string >::type sql(sqlSEXP);
+    Rcpp::traits::input_parameter< ListOf<List> >::type quotes(quotesSEXP);
+    Rcpp::traits::input_parameter< ListOf<List> >::type comments(commentsSEXP);
+    __result = Rcpp::wrap(sqlParseVariablesImpl(sql, quotes, comments));
+    return __result;
 END_RCPP
 }
