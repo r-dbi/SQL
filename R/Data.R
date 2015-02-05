@@ -32,7 +32,9 @@ setMethod("sqlData", "DBIConnection", function(con, value, row.names = NA, ...) 
 
   # Quote all strings
   is_char <- vapply(value, is.character, logical(1))
-  value[is_char] <- lapply(value[is_char], function(x) dbQuoteString(con, x))
+  value[is_char] <- lapply(value[is_char], function(x) {
+    enc2utf8(dbQuoteString(con, x))
+  })
 
   # Convert everything to character and turn NAs into NULL
   value[] <- lapply(value, as.character)
