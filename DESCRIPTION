@@ -7,7 +7,7 @@ Authors@R: c(
   )
 Description: The SQL package provides a number of useful functions for working
    with SQL strings.
-Depends: R (>= 3.1.2)
+Depends: R (>= 3.1.0)
 License: GPL-3
 LazyData: true
 Imports:
