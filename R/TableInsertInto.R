@@ -35,3 +35,31 @@ setMethod("sqlTableInsertInto", "DBIConnection",
     ))
   }
 )
+
+#' Generated parameterised template for inserting rows.
+#'
+#' @inheritParams sqlTableCreate
+#' @inheritParams sqlTableInsertInto
+#' @inheritParams rownames
+#' @param prefix Parameter prefix to put in front of column id.
+#' @param values A data frame. Used only for the column names.
+#' @export
+#' @examples
+#' sqlTableInsertIntoTemplate(ANSI(), "iris", iris)
+#'
+#' sqlTableInsertIntoTemplate(ANSI(), "mtcars", mtcars)
+#' sqlTableInsertIntoTemplate(ANSI(), "mtcars", mtcars, row.names = FALSE)
+sqlTableInsertIntoTemplate <- function(con, table, values, row.names = NA, prefix = "?", ...) {
+  table <- dbQuoteIdentifier(con, table)
+
+  values <- rownamesToColumn(values[0, , drop = FALSE], row.names)
+  fields <- dbQuoteIdentifier(con, names(values))
+
+  # Convert fields into a character matrix
+  SQL(paste0(
+    "INSERT INTO ", table, "\n",
+    "  (", paste(fields, collapse = ", "), ")\n",
+    "VALUES\n",
+    paste0("  (", paste0(prefix, seq_along(fields), collapse = ", "), ")", collapse = ",\n")
+  ))
+}
